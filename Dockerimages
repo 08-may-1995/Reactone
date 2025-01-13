@@ -1,0 +1,50 @@
+# Base Jenkins image
+FROM jenkins/jenkins:lts
+
+# Install Docker inside the Jenkins container
+USER root
+RUN apt-get update && \
+    apt-get install -y docker.io
+
+# Switch back to Jenkins user
+USER jenkins
+
+# Copy custom configuration or plugins (optional)
+COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
+RUN /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
+
+# Define volumes for Jenkins data
+VOLUME /var/jenkins_home
+
+#expose the port
+ExPOSE 8080
+
+============
+
+# Base SonarQube image
+FROM sonarqube:latest
+
+# Set environment variables if necessary
+ENV SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+
+# Copy custom configuration files (optional)
+COPY sonar.properties /opt/sonarqube/conf/sonar.properties
+
+# Expose the default SonarQube port
+EXPOSE 9000
+
+==================
+
+# Base Postgres image
+FROM postgres:latest
+
+# Set environment variables
+ENV POSTGRES_USER=sonar
+ENV POSTGRES_PASSWORD=sonar
+ENV POSTGRES_DB=sonar
+
+# Copy initialization scripts
+COPY init-db.sql /docker-entrypoint-initdb.d/
+
+# Expose the default Postgres port
+EXPOSE 5432
