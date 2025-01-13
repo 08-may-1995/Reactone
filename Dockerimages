@@ -45,6 +45,7 @@ ENV POSTGRES_DB=sonar
 
 # Copy initialization scripts
 COPY init-db.sql /docker-entrypoint-initdb.d/
+COPY /react.js
 
 # Expose the default Postgres port
 EXPOSE 5432
