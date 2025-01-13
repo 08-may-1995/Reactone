@@ -1,0 +1,34 @@
+pipeline {
+    agent any
+    environment {
+        SONARQUBE_SERVER = 'SonarQube'
+    }
+    stages {
+        stage('Provision ECS Infrastructure') {
+            steps {
+                script {
+                    sh 'terraform init'
+                    sh 'terraform apply -auto-approve'
+                }
+            }
+        }
+        stage('Run SonarQube Scan') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh 'sonar-scanner'
+                }
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t myapp .'
+            }
+        }
+        stage('Deploy to ECS/EC2') {
+            steps {
+                echo 'Deploying application...'
+                // Add deployment commands
+            }
+        }
+    }
+}
