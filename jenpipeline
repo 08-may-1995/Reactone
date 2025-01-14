@@ -14,7 +14,7 @@ pipeline {
         }
         stage('Run SonarQube Scan') {
             steps {
-                withSonarQubeEnv('SonarQube') {
+                withSonarQubeEnv$('SonarQube') {
                     sh 'sonar-scanner'
                 }
             }
@@ -27,7 +27,8 @@ pipeline {
         stage('Deploy to ECS/EC2') {
             steps {
                 echo 'Deploying application...'
-                // Add deployment commands
+                 docker pull myapp:latest
+                 docker run -d --name running_app -p 80:80 myapp:latest
             }
         }
     }
